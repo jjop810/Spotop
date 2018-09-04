@@ -50,7 +50,7 @@ class App extends Component {
     if(!accesToken)
     return;
 
-    fetch('https://api.spotify.com/v1/artists?ids=2R21vXR83lH98kGeO99Y66%2C6YIsL2oVmFhVL7EIKwKVQo%2C4q3ewBCX7sLwd24euuV69X%2C4SsVbpTthjScTS7U2hmr1X%2C0ykT1si9XRFPmEvWOnf4YI', {
+    fetch('https://api.spotify.com/v1/artists?ids=2R21vXR83lH98kGeO99Y66%2C6YIsL2oVmFhVL7EIKwKVQo%2C4q3ewBCX7sLwd24euuV69X%2C4SsVbpTthjScTS7U2hmr1X', {
       headers:{'Authorization': 'Bearer '+accesToken}
     }).then(response=>response.json())
     .then(data => this.setState({
@@ -76,9 +76,12 @@ class App extends Component {
 
 
   render() {
-    let artistData = this.state.Artist ? this.state.Artist.name : [];
     return (
-      <div className="App">
+      <div className="App" body={{width: "100"
+        ,height: "100%",
+        margin: "0px",
+        padding: "0px",
+        overflowx: "hidden" }}>
 
         {this.state.Artist ?
         
@@ -97,5 +100,4 @@ class App extends Component {
     );
   }
 }
-
 export default App;

@@ -8,7 +8,7 @@ let defaultStyle = {
 export default class ArtistTest extends Component {
   render() {
     return (
-      <div style={{position: "relative", bottom: "100%", marginTop: "-180px"}}>
+      <div style={{position: "relative", marginTop: "-180px"}}>
         <div className="Rectangles" style={{position: "relative", top: "200px"}}>
         <Rectangle width={'100%'} height={90} fill={{ color: '#333333' }} /></div>
         <div>
