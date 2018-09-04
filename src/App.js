@@ -9,37 +9,13 @@ let defaultStyle = {
   color: '#000'
 };
 
-let fakeServerData = {
-  TopArtits: {
-    Artist: [
-      {
-        name: 'Ghost',
-        followers: '501,378'
-      },
-      {
-        name: 'Avatar',
-        followers: '101,885'
-      },
-      {
-        name: 'Alestorm',
-        followers: '228,242'
-      },
-      {
-        name: 'Glory Hammer',
-        followers: '49,042'
-      },
-
-    ]
-
-  }
-}
 
 class Category extends Component {
   render() {
     return (
       <div className="category">
 
-        <h1 style={{ ...defaultStyle, 'font-size': '54px' }}>{this.props.temp.genre.toUpperCase()}</h1>
+        <h1 style={{ ...defaultStyle, 'font-size': '54px'}}>Hello</h1>
       </div>
     );
   }
@@ -74,17 +50,27 @@ class App extends Component {
     if(!accesToken)
     return;
 
-    fetch('https://api.spotify.com/v1/artists/6YIsL2oVmFhVL7EIKwKVQo', {
+    fetch('https://api.spotify.com/v1/artists?ids=2R21vXR83lH98kGeO99Y66%2C6YIsL2oVmFhVL7EIKwKVQo%2C4q3ewBCX7sLwd24euuV69X%2C4SsVbpTthjScTS7U2hmr1X%2C0ykT1si9XRFPmEvWOnf4YI', {
       headers:{'Authorization': 'Bearer '+accesToken}
     }).then(response=>response.json())
     .then(data => this.setState({
-      Artist: {name: data.name, imageurl: data.images[0].url, follow: data.followers.total, genre: data.genres[0]}}))
+      Artist: data.artists.sort(function(a, b){
+        if(a.followers.total > b.followers.total) return -1;
+        if(a.followers.total < b.followers.total) return 1;
+        return 0;
+    }).map(item => {
+        return{
+          name: item.name,
+          imageurl: item.images[2].url,
+          follow: item.followers.total.toLocaleString()
+        }
+      })}))
       
-      fetch('https://api.spotify.com/v1/artists/6YIsL2oVmFhVL7EIKwKVQo', {
+      //this is a temp test function
+      fetch('https://api.spotify.com/v1/artists?ids=2R21vXR83lH98kGeO99Y66%2C6YIsL2oVmFhVL7EIKwKVQo%2C4q3ewBCX7sLwd24euuV69X%2C4SsVbpTthjScTS7U2hmr1X', {
         headers:{'Authorization': 'Bearer '+accesToken}
       }).then(response=>response.json())
-      .then(data => console.log(data.genres[0]))
-    
+      .then(data => console.log(data.artists[2]))
       
   }
 
@@ -95,16 +81,18 @@ class App extends Component {
       <div className="App">
 
         {this.state.Artist ?
+        
           <div>
 
             <CreateRectangle />
-            <Category temp={this.state.Artist}/>
-            <ArtistTest test={this.state.Artist}/>
+
+            <Category/>
+
+            {this.state.Artist.map(info =>
+             <ArtistTest test={info}/>)}
             </div> :<button onClick={()=>window.location='http://localhost:8888/login'}
             style={{padding: '20px','font-size' : '78px', 'margin-top': '20px'}}>Sign in with Spotify to see Information</button>
-
         }
-
       </div>
     );
   }
