@@ -3,6 +3,7 @@ import './App.css';
 import { Rectangle } from 'react-shapes';
 import ArtistTest from './Component/info';
 import followTxt from './Component/info';
+import queryString from 'query-string';
 
 let defaultStyle = {
   color: '#000'
@@ -38,11 +39,13 @@ class Category extends Component {
     return (
       <div className="category">
 
-        <h1 style={{ ...defaultStyle, 'font-size': '54px' }}>Title</h1>
+        <h1 style={{ ...defaultStyle, 'font-size': '54px' }}>{this.props.temp.genre.toUpperCase()}</h1>
       </div>
     );
   }
 };
+
+
 
 class CreateRectangle extends Component {
   render() {
@@ -54,6 +57,8 @@ class CreateRectangle extends Component {
   }
 };
 
+
+
 class App extends Component {
 
   constructor() {
@@ -61,22 +66,40 @@ class App extends Component {
     this.state = { serverData: {} }
   };
 
+
+
   componentDidMount() {
+    let parsed = queryString.parse(window.location.search);
+    let accesToken = parsed.access_token;
+    if(!accesToken)
+    return;
+
+    fetch('https://api.spotify.com/v1/artists/6YIsL2oVmFhVL7EIKwKVQo', {
+      headers:{'Authorization': 'Bearer '+accesToken}
+    }).then(response=>response.json())
+    .then(data => this.setState({
+      Artist: {name: data.name, imageurl: data.images[0].url, follow: data.followers.total, genre: data.genres[0]}}))
+      
+      fetch('https://api.spotify.com/v1/artists/6YIsL2oVmFhVL7EIKwKVQo', {
+        headers:{'Authorization': 'Bearer '+accesToken}
+      }).then(response=>response.json())
+      .then(data => console.log(data.genres[0]))
+    
+      
   }
 
 
   render() {
+    let artistData = this.state.Artist ? this.state.Artist.name : [];
     return (
       <div className="App">
 
-        {this.state.serverData.TopArtits ?
+        {this.state.Artist ?
           <div>
 
             <CreateRectangle />
-            <Category />
-            {this.state.serverData.TopArtits.Artist.map(artist =>
-              <ArtistTest test={artist} />
-            )}
+            <Category temp={this.state.Artist}/>
+            <ArtistTest test={this.state.Artist}/>
             </div> :<button onClick={()=>window.location='http://localhost:8888/login'}
             style={{padding: '20px','font-size' : '78px', 'margin-top': '20px'}}>Sign in with Spotify to see Information</button>
 
