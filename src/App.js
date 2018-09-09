@@ -15,7 +15,7 @@ class Category extends Component {
     return (
       <div className="category">
 
-        <h1 style={{ ...defaultStyle, 'font-size': '54px'}}>Jose Juan</h1>
+        <h1 style={{ ...defaultStyle, 'font-size': '54px'}}>{this.props.playlist}</h1>
       </div>
     );
   }
@@ -33,6 +33,20 @@ class CreateRectangle extends Component {
   }
 };
 
+function uniq_fast(a, playlist) {
+  let seen = {};
+  let out = [];
+  let len = a[playlist].trackDatas.length;;
+  let j = 0;
+  for(let i = 0; i < len; i++) {
+       let item = a[playlist].trackDatas[i].artists;
+       if(seen[item] !== 1) {
+             seen[item] = 1;
+             out[j++] = item;
+       }
+  }
+  return out;
+}
 
 
 class App extends Component {
@@ -46,35 +60,74 @@ class App extends Component {
 
   componentDidMount() {
     let parsed = queryString.parse(window.location.search);
-    let accesToken = parsed.access_token;
-    if(!accesToken)
+    let accessToken = parsed.access_token;
+    if(!accessToken)
     return;
 
-    fetch('https://api.spotify.com/v1/artists?ids=2R21vXR83lH98kGeO99Y66%2C6YIsL2oVmFhVL7EIKwKVQo%2C4q3ewBCX7sLwd24euuV69X%2C4SsVbpTthjScTS7U2hmr1X%2C4VMYDCV2IEDYJArk749S6m%2C5bWUlnPx9OYKsLiUJrhCA1', {
-      headers:{'Authorization': 'Bearer '+accesToken}
+    
+      
+
+      
+      fetch('https://api.spotify.com/v1/me/playlists', {
+        headers: {'Authorization': 'Bearer ' + accessToken}
+      }).then(response => response.json())
+      .then(playlistData => {
+        let playlists = playlistData.items
+        let trackDataPromises = playlists.map(playlist => {
+          let responsePromise = fetch(playlist.tracks.href, {
+            headers: {'Authorization': 'Bearer ' + accessToken}
+          })
+          let trackDataPromise = responsePromise
+            .then(response => response.json())
+          return trackDataPromise
+        })
+        let allTracksDataPromises = 
+          Promise.all(trackDataPromises)
+        let playlistsPromise = allTracksDataPromises.then(trackDatas => {
+          trackDatas.forEach((trackData, i) => {
+            playlists[i].trackDatas = trackData.items
+              .map(item => item.track)
+              .map(trackData => ({
+                name: trackData.name,
+                artists: trackData.artists[0].id
+                
+              }))
+          })
+          return playlists
+        })
+        return playlistsPromise
+      })
+      .then(playlists => {
+        let playlistnum = 1;
+        let item = uniq_fast(playlists, playlistnum);
+        console.log(item.length);
+        let counter = item.length;
+        let playlistname = playlists[playlistnum].name;
+        if(counter >= 50)
+        counter = 50;
+        let artistHref = 'https://api.spotify.com/v1/artists?ids=' + item[0]
+        for(let i = 1; i < counter; i++)
+          artistHref +=  "%2C"+item[i]
+          
+          fetch(artistHref, {
+      headers:{'Authorization': 'Bearer '+accessToken}
     }).then(response=>response.json())
     .then(data => this.setState({
       Artist: data.artists.sort(function(a, b){
         if(a.followers.total > b.followers.total) return -1;
         if(a.followers.total < b.followers.total) return 1;
         return 0;
+        
     }).map(item => {
         return{
           name: item.name,
           imageurl: item.images[2].url,
-          follow: item.followers.total.toLocaleString()
+          follow: item.followers.total.toLocaleString(),
+          playlistName: playlistname
         }
       })}))
-      
-      //this is a temp test function
-      fetch('https://api.spotify.com/v1/artists?ids=2R21vXR83lH98kGeO99Y66%2C6YIsL2oVmFhVL7EIKwKVQo%2C4q3ewBCX7sLwd24euuV69X%2C4SsVbpTthjScTS7U2hmr1X', {
-        headers:{'Authorization': 'Bearer '+accesToken}
-      }).then(response=>response.json())
-      .then(data => console.log(data.artists[2]))
-      
+      })
   }
-
-
   render() {
     return (
       <div className="App">
@@ -84,8 +137,7 @@ class App extends Component {
           <div>
 
             <CreateRectangle />
-
-            <Category/>
+             <Category playlist={this.state.Artist[0].playlistName}/>
 
             {this.state.Artist.map(info =>
              <ArtistTest test={info}/>)}
