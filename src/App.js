@@ -15,7 +15,7 @@ class Category extends Component {
     return (
       <div className="category">
 
-        <h1 style={{ ...defaultStyle, 'font-size': '54px'}}>Hello</h1>
+        <h1 style={{ ...defaultStyle, 'font-size': '54px'}}>Jose Juan</h1>
       </div>
     );
   }
@@ -50,7 +50,7 @@ class App extends Component {
     if(!accesToken)
     return;
 
-    fetch('https://api.spotify.com/v1/artists?ids=2R21vXR83lH98kGeO99Y66%2C6YIsL2oVmFhVL7EIKwKVQo%2C4q3ewBCX7sLwd24euuV69X%2C4SsVbpTthjScTS7U2hmr1X', {
+    fetch('https://api.spotify.com/v1/artists?ids=2R21vXR83lH98kGeO99Y66%2C6YIsL2oVmFhVL7EIKwKVQo%2C4q3ewBCX7sLwd24euuV69X%2C4SsVbpTthjScTS7U2hmr1X%2C4VMYDCV2IEDYJArk749S6m%2C5bWUlnPx9OYKsLiUJrhCA1', {
       headers:{'Authorization': 'Bearer '+accesToken}
     }).then(response=>response.json())
     .then(data => this.setState({
@@ -77,11 +77,7 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App" body={{width: "100"
-        ,height: "100%",
-        margin: "0px",
-        padding: "0px",
-        overflowx: "hidden" }}>
+      <div className="App">
 
         {this.state.Artist ?
         
