@@ -8,7 +8,7 @@ import queryString from 'query-string';
 let defaultStyle = {
   color: '#000'
 };
-
+let currentPlaylist = 0;
 
 class Category extends Component {
   render() {
@@ -34,20 +34,28 @@ class CreateRectangle extends Component {
 };
 
 function uniq_fast(a, playlist) {
-  let seen = {};
   let out = [];
-  let len = a[playlist].trackDatas.length;;
-  let j = 0;
-  for(let i = 0; i < len; i++) {
-       let item = a[playlist].trackDatas[i].artists;
-       if(seen[item] !== 1) {
-             seen[item] = 1;
-             out[j++] = item;
-       }
+  for(let i = 0; i < a[playlist].trackDatas.length; i++) {
+       out.push(a[playlist].trackDatas[i].artists);
   }
-  return out;
+  let unique = [...new Set(out)];
+  return unique;
 }
 
+function noNulls(arr, playlist){
+  let temp = [];
+
+  for(let i of arr)
+  i && temp.push(i)
+
+arr = temp;
+return arr;
+}
+
+function readfromAPI(){
+
+
+}
 
 class App extends Component {
 
@@ -56,17 +64,11 @@ class App extends Component {
     this.state = { serverData: {} }
   };
 
-
-
   componentDidMount() {
     let parsed = queryString.parse(window.location.search);
     let accessToken = parsed.access_token;
     if(!accessToken)
     return;
-
-    
-      
-
       
       fetch('https://api.spotify.com/v1/me/playlists', {
         headers: {'Authorization': 'Bearer ' + accessToken}
@@ -98,9 +100,10 @@ class App extends Component {
         return playlistsPromise
       })
       .then(playlists => {
-        let playlistnum = 1;
+        let playlistnum = currentPlaylist;
+        console.log(playlists)
         let item = uniq_fast(playlists, playlistnum);
-        console.log(item.length);
+        item = noNulls(item,playlistnum);
         let counter = item.length;
         let playlistname = playlists[playlistnum].name;
         if(counter >= 50)
@@ -119,14 +122,17 @@ class App extends Component {
         return 0;
         
     }).map(item => {
+      console.log(item);
+      //console.log(item.name +" == " +item.followers.total+' == '+ counter +' == '+item.images[2].url);
         return{
           name: item.name,
-          imageurl: item.images[2].url,
+          imageurl: !item.images[2] ? "http://icons-for-free.com/free-icons/png/512/928429.png" : item.images[2].url,
           follow: item.followers.total.toLocaleString(),
           playlistName: playlistname
         }
       })}))
       })
+    
   }
   render() {
     return (
@@ -135,7 +141,11 @@ class App extends Component {
         {this.state.Artist ?
         
           <div>
+            <button onClick={()=> {
+            currentPlaylist = currentPlaylist + 1;
 
+            console.log(currentPlaylist);}}
+            style={{padding: '20px','font-size' : '78px', 'margin-top': '20px'}}>Change Playlist</button>
             <CreateRectangle />
              <Category playlist={this.state.Artist[0].playlistName}/>
 

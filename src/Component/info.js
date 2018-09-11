@@ -8,13 +8,13 @@ let defaultStyle = {
 export default class ArtistTest extends Component {
   render() {
     return (
-      <div style={{position: "relative", marginTop: "-180px"}}>
+      <div style={{position: "relative", marginTop: "-185px"}}>
         <div className="Rectangles" style={{position: "relative", top: "200px"}}>
         <Rectangle width={'100%'} height={90} fill={{ color: '#333333' }} /></div>
         <div>
           <img src={this.props.test.imageurl} style={{width: '80px',height: '80px',position: "relative", right: "30%", top: "110px"}}/>
           </div>
-        <div style={{position: "relative", right: "20%", top: "40px", color: "white"}}>
+        <div style={{position: "relative", right: "5%", top: "40px", color: "white"}}>
           <h3>{this.props.test.name} </h3>
         </div>
         <div style={{position: "relative", left: "30%", top: "0%", color: "white"}}>
