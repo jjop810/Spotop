@@ -8,7 +8,10 @@ import queryString from 'query-string';
 let defaultStyle = {
   color: '#000'
 };
-let currentPlaylist = 0;
+
+
+let currentPlaylist = 3;
+
 
 class Category extends Component {
   render() {
@@ -21,7 +24,16 @@ class Category extends Component {
   }
 };
 
+function artistinfo()
+{
+  let parsed = queryString.parse(window.location.search);
+  let accesToken = parsed.access_token;
 
+  fetch('https://api.spotify.com/v1/artists/6YIsL2oVmFhVL7EIKwKVQo', {
+    headers:{'Authorization': 'Bearer '+accesToken}
+  }).then(response=>response.json())
+  .then(data => console.log(data.genres[0]))
+}
 
 class CreateRectangle extends Component {
   render() {
@@ -52,11 +64,6 @@ arr = temp;
 return arr;
 }
 
-function readfromAPI(){
-
-
-}
-
 class App extends Component {
 
   constructor() {
@@ -65,11 +72,11 @@ class App extends Component {
   };
 
   componentDidMount() {
+
     let parsed = queryString.parse(window.location.search);
     let accessToken = parsed.access_token;
     if(!accessToken)
     return;
-      
       fetch('https://api.spotify.com/v1/me/playlists', {
         headers: {'Authorization': 'Bearer ' + accessToken}
       }).then(response => response.json())
@@ -111,7 +118,6 @@ class App extends Component {
         let artistHref = 'https://api.spotify.com/v1/artists?ids=' + item[0]
         for(let i = 1; i < counter; i++)
           artistHref +=  "%2C"+item[i]
-          
           fetch(artistHref, {
       headers:{'Authorization': 'Bearer '+accessToken}
     }).then(response=>response.json())
@@ -133,6 +139,7 @@ class App extends Component {
       })}))
       })
     
+    
   }
   render() {
     return (
@@ -143,16 +150,16 @@ class App extends Component {
           <div>
             <button onClick={()=> {
             currentPlaylist = currentPlaylist + 1;
-
             console.log(currentPlaylist);}}
             style={{padding: '20px','font-size' : '78px', 'margin-top': '20px'}}>Change Playlist</button>
             <CreateRectangle />
              <Category playlist={this.state.Artist[0].playlistName}/>
-
+ 
             {this.state.Artist.map(info =>
              <ArtistTest test={info}/>)}
             </div> :<button onClick={()=>window.location='http://localhost:8888/login'}
             style={{padding: '20px','font-size' : '78px', 'margin-top': '20px'}}>Sign in with Spotify to see Information</button>
+            
         }
       </div>
     );
